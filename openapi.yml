@@ -1,0 +1,217 @@
+openapi: 3.0.1
+info:
+  title: META Logger API
+  version: "1.0"
+paths:
+  /levels:
+    get:
+      description: Return map of available levels
+      responses:
+        200:
+          description: Map of levels in format Label -> Value
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties: 
+                  type: "string"
+                example:
+                  {
+                    "Debug":"debug",
+                    "Info":"info",
+                    "Notice":"notice",
+                    "Warning":"warn",
+                    "Error":"error",
+                    "Critical":"critical",
+                    "Alert":"alert",
+                    "Emergency":"emergency"
+                  }
+
+  /targets:
+    get:
+      description: Return list of logging targets with configured levels
+      responses:
+        200:
+          description: List of logging targets with configured levels in format Target ID -> Level
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties: 
+                  type: "string"
+                example: {"__console__":"info","__mgmtSrvLog__":"debug"}
+
+  /targets/{target}:
+    get:
+      description: Return log level of specified target
+      parameters:
+        - name: target
+          in: path
+          description: Target ID
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Log level
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: warn
+        404:
+          description: Target not found
+          content:
+            text/plain:
+              schema:
+                type: "string"
+  /targets/{target}/{level}:
+    post:
+      description: Set target log level
+      parameters:
+        - name: target
+          in: path
+          description: Target ID
+          required: true
+          schema:
+            type: "string"
+        - name: level
+          in: path
+          description: Log level
+          required: true
+          schema:
+            type: "string"
+            example: info
+      responses:
+        204:
+          description: Level set
+        400:
+          description: Bad request - invalid log level or target not exists
+          content:
+            text/plain:
+              schema:
+                type: "string"
+
+  /facilities:
+    get:
+      description: Return list of logging facilities with configured levels
+      responses:
+        200:
+          description: List of logging facilities with configured levels in format Facility ID -> Level
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties: 
+                  type: "string"
+                example: {"__default__":"debug","http":"debug","prom-exporter":"debug","db":"debug","api":"debug","logger-mgmt-srv":"debug"}
+
+  /facilities/{facility}:
+    get:
+      description: Return log level of specified facility
+      parameters:
+        - name: facility
+          in: path
+          description: Facility ID
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Log level
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: warn
+        404:
+          description: Facility not found
+          content:
+            text/plain:
+              schema:
+                type: "string"
+  /facilities/{facility}/{level}:
+    post:
+      description: Set facility log level
+      parameters:
+        - name: facility
+          in: path
+          description: Facility ID
+          required: true
+          schema:
+            type: "string"
+        - name: level
+          in: path
+          description: Log level
+          required: true
+          schema:
+            type: "string"
+            example: info
+      responses:
+        204:
+          description: Level set
+        400:
+          description: Bad request - invalid log level or facility not exists
+          content:
+            text/plain:
+              schema:
+                type: "string"
+ 
+  /config:
+    get:
+      description: Return overall configuration
+      responses:
+        200:
+          description: Configuration object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/configObject"
+    post:
+      description: Set overall configuration
+      requestBody:
+        description: Configuration object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/configObject"
+      responses:
+        204:
+          description: Configuration set
+        400:
+          description: Bad request - invalid log levels or specified facilities and targets not exist
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /restore:
+    post:
+      description: Restore custom configuration to initial
+      responses:
+        204:
+          description: Configuration restored
+
+components:
+  schemas:
+    configObject:
+      type: "object"
+      required:
+        - targets
+        - facilities
+        - trace
+      properties:
+        targets:
+          type: "object"
+          description: Logging targets with configured log levels
+          additionalProperties:
+            type: string
+        facilities:
+          type: "object"
+          description: Logging facilities with configured log levels
+          additionalProperties:
+            type: string
+        trace:
+          type: "boolean"
+          description: If to capture stack trace for all log messages
+      example: {"targets":{"__console__":"info","__mgmtSrvLog__":"debug"},"facilities":{"http":"debug","prom-exporter":"debug","db":"debug","api":"debug","logger-mgmt-srv":"debug"},"trace":true}

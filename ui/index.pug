@@ -1,0 +1,157 @@
+mixin LevelCombo(stack, name, selection)
+	select(name=stack + "[" + name + "]")
+		each value, level  in logLevels
+			option(value=value, selected=( value == selection ? "true" : null ))=level
+
+doctype html
+html
+	head
+		meta(charset="utf-8")
+		title META Logger UI
+		link(rel="stylesheet", type="text/css", href="https://fonts.googleapis.com/css?family=Roboto:100,400,500,700")
+		link(rel="stylesheet", type="text/css", href="main.css")
+		link(rel="stylesheet", type="text/css", href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/googlecode.min.css")
+		//link(rel="stylesheet", type="text/css", href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night.min.css")
+		script(type="text/javascript", src="main.js")
+		script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js")
+		script(type="text/javascript").
+			hljs.initHighlightingOnLoad();
+	body
+		script(type="text/javascript").
+			initTheme();
+		.layout
+			aside.sidebar
+				header
+					h1
+						strong META 
+						| Logger UI
+				.main
+					form#config
+						.config-block
+							h2 Targets
+							ul
+								each level, name in targets
+									li
+										label
+											span=name
+											+LevelCombo("targets", name, level)
+
+						.config-block
+							h2 Facilities
+							ul
+								each level, name in facilities
+									li
+										label
+											span=name
+											+LevelCombo("facilities", name, level)
+
+						.config-block
+							h2 Other
+							p
+								label
+									input(type="checkbox", name="trace", value="1", checked=( traceEnabled ? "true" : null ))
+									span Log stack trace 
+									span.note (Has significant performance impact)
+
+						p.actions
+							button.primary(type="submit")#settings-set Set config
+							button(type="button")#settings-reset Restore
+
+				footer
+					p.github
+						a(href="https://github.com/metaplatform/meta2-logger-server.git", target="_blank").
+							<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" /></svg>
+					p.theme-switch
+						span.icon.
+							<svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C7.79,7.9 8.75,10.87 10.95,13.06C13.14,15.26 16.1,16.22 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z" /></svg>
+						button(type="button", title="Toggle dark theme")#theme-switch
+							span.on.
+								<svg viewBox="0 0 24 24"><path d="M17,7A5,5 0 0,1 22,12A5,5 0 0,1 17,17A5,5 0 0,1 12,12A5,5 0 0,1 17,7M4,14A2,2 0 0,1 2,12A2,2 0 0,1 4,10H10V14H4Z" /></svg>
+							span.off.
+								<svg viewBox="0 0 24 24"><path d="M7,7A5,5 0 0,1 12,12A5,5 0 0,1 7,17A5,5 0 0,1 2,12A5,5 0 0,1 7,7M20,14H14V10H20A2,2 0 0,1 22,12A2,2 0 0,1 20,14M7,9A3,3 0 0,0 4,12A3,3 0 0,0 7,15A3,3 0 0,0 10,12A3,3 0 0,0 7,9Z" /></svg>
+
+			if messages
+				.log#log
+					form.filter(method="get")
+						.row
+							.wrap
+								.group
+									h2 Facilities:
+									ul
+										each level, name in facilities
+											li(class=( filter.facilities.length === 0 || filter.facilities.indexOf(name) >= 0 ? "active" : null ))
+												label
+													input(type="checkbox", name="facilities[]", value=name, checked=( filter.facilities.length === 0 || filter.facilities.indexOf(name) >= 0 ? "true" : null ))
+													span=name
+								.group
+									h2 Levels:
+									ul
+										each value, level in logLevels
+											li(class=( filter.levels.length === 0 || filter.levels.indexOf(value) >= 0 ? "active" : null ))
+												label
+													input(type="checkbox", name="levels[]", value=value, checked=( filter.levels.length === 0 || filter.levels.indexOf(value) >= 0 ? "true" : null ))
+													span(class="level-" + value)=level
+							
+							p.action
+								button.primary(type=submit) Filter
+								button.only-icon(type="button", title="Reset filter")#reset-filter.
+									<svg viewBox="0 0 24 24"><path d="M14.76,20.83L17.6,18L14.76,15.17L16.17,13.76L19,16.57L21.83,13.76L23.24,15.17L20.43,18L23.24,20.83L21.83,22.24L19,19.4L16.17,22.24L14.76,20.83M2,2H20V2H20V4H19.92L13,10.92V22.91L9,18.91V10.91L2.09,4H2V2Z" /></svg>
+								button.only-icon(type="button", title="Clear memory log")#clear-log.
+									<svg viewBox="0 0 24 24"><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>
+
+						.row.search
+							p.col-timestamp
+								span.icon.
+									<svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" /></svg>
+								input(type="text", name="search[timestamp]", placeholder="Timestamp", value=filter.search.timestamp || "")
+							p.col-level
+								input(type="text", name="search[level]", placeholder="Level", value=filter.search.level || "")
+							p.col-facility
+								input(type="text", name="search[facility]", placeholder="Facility", value=filter.search.facility || "")
+							p.col-message
+								input(type="text", name="search[message]", placeholder="Message", value=filter.search.message || "")
+							p.col-meta
+								input(type="text", name="search[meta]", placeholder="Meta data", value=filter.search.meta || "")
+
+					.messages
+						.entries-wrap
+							table(class="entries " + ( messages.length % 2 == 0 ? "even" : "odd" ))
+								tbody
+									each message in messages
+										tr
+											td.col-timestamp=(new Date(message.timestamp * 1000)).toLocaleString()
+											td(class="col-level level-" + message.level)=message.level
+											td.col-facility
+												if message.facility
+													| [
+													strong=message.facility
+													| ]
+												else
+													|  
+
+											td.col-message
+												.content-wrap!=message.message
+											td.col-meta
+												if Object.keys(message.meta).length > 0
+													.content-wrap
+														ul
+															each value, key in message.meta
+																if key !== "trace"
+																	li
+																		span.key=key
+																		span.value=value
+											td.col-actions
+												button(type=button, title="Show more").show-more
+													.open +
+													.close -
+
+												if message.meta["trace"]
+													button(type=button, title="Show trace").show-trace.
+														<svg viewBox="0 0 24 24"><path d="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7" /></svg>
+													pre.trace=message.meta["trace"]
+													
+				script(type="text/javascript").
+					initLogStream(#{messages.length > 0 ? messages[0].timestamp : 0});
+			else
+				.log
+					p.disabled Memory logging is disabled

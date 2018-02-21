@@ -1,0 +1,5 @@
+# Typescript sources
+/src
+/__tests__
+tsconfig.json
+tslint.json
